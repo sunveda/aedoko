@@ -128,7 +128,7 @@ export default function Home() {
     <main className="app-shell">
       <header className="topbar">
         <button className="brand brand-button" type="button" onClick={() => setState('idle')} aria-label="AED Door Arrow home">
-          <span className="brand-mark" aria-hidden="true">AED</span><span>Door Arrow</span>
+          <span className="protect-mark" aria-hidden="true"><span className="heart-core" /></span><span>Door Arrow</span>
         </button>
         <button className="language-button" type="button" aria-expanded={languageOpen} onClick={() => setLanguageOpen(!languageOpen)}>
           <span aria-hidden="true">文</span> {localeNames[locale]} <span aria-hidden="true">⌄</span>

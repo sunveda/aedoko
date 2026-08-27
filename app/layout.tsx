@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'AED Door Arrow — Tokyo pilot',
   description: 'A phone-first direction aid for verified municipal AED listings in Tokyo.',
+  icons: { icon: '/favicon.svg' },
 };
 
 export default function RootLayout({

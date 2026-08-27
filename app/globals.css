@@ -10,7 +10,12 @@ button:focus-visible, a:focus-visible { outline: 4px solid #287c68; outline-offs
 .topbar { height: 76px; display: flex; align-items: center; justify-content: space-between; padding: 0 clamp(20px, 5vw, 72px); border-bottom: 1px solid var(--line); }
 .brand { display: flex; gap: 12px; align-items: center; color: inherit; text-decoration: none; font-weight: 800; letter-spacing: -.03em; }
 .brand-button { padding: 0; border: 0; background: none; cursor: pointer; }
-.brand-mark { display: grid; place-items: center; width: 44px; height: 30px; background: var(--signal); color: #fff; font-size: 13px; letter-spacing: .04em; }
+.protect-mark { position: relative; display: grid; place-items: center; width: 38px; height: 42px; background: var(--signal); clip-path: polygon(50% 0, 96% 16%, 91% 65%, 72% 87%, 50% 100%, 28% 87%, 9% 65%, 4% 16%); }
+.protect-mark::before { content: ''; position: absolute; inset: 4px; background: #fff; clip-path: inherit; }
+.heart-core { position: relative; z-index: 1; width: 14px; height: 14px; margin-top: 3px; background: var(--signal); transform: rotate(45deg); }
+.heart-core::before, .heart-core::after { content: ''; position: absolute; width: 14px; height: 14px; border-radius: 50%; background: var(--signal); }
+.heart-core::before { left: -7px; }
+.heart-core::after { top: -7px; }
 .language-button { min-height: 44px; padding: 0 15px; border: 1px solid var(--ink); background: transparent; color: inherit; cursor: pointer; }
 .emergency-strip { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 22px; padding: 20px clamp(20px, 5vw, 72px); background: var(--signal); color: white; }
 .eyebrow, .step-label { margin: 0 0 6px; font-size: 11px; letter-spacing: .16em; font-weight: 900; }
