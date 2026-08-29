@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'AED Door Arrow — Tokyo pilot',
-  description: 'A phone-first direction aid for verified municipal AED listings in Tokyo.',
+  title: 'AEDoko — Tokyo AED pilot',
+  description: 'AEDoko helps you find a nearby source-listed AED and call 119 without losing precious time.',
   icons: { icon: '/favicon.svg' },
 };
 

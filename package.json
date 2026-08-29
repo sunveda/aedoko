@@ -1,5 +1,5 @@
 {
-  "name": "sites-project",
+  "name": "aedoko",
   "version": "0.1.0",
   "private": true,
   "engines": {
@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "vinext dev",
     "build": "vinext build",
+    "build:pages": "vite build --config vite.github-pages.config.ts",
     "start": "vinext start",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "data:build": "python3 scripts/build-aed-snapshot.py",

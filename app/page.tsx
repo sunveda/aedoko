@@ -74,7 +74,7 @@ export default function Home() {
 
   const loadSnapshot = async () => {
     if (dataset && coverage) return { data: dataset, coverageData: coverage };
-    const [dataResponse, coverageResponse] = await Promise.all([fetch('/data/aed-tokyo.v1.json'), fetch('/data/aed-tokyo-coverage.v1.json')]);
+    const [dataResponse, coverageResponse] = await Promise.all([fetch('./data/aed-tokyo.v1.json'), fetch('./data/aed-tokyo-coverage.v1.json')]);
     if (!dataResponse.ok || !coverageResponse.ok) throw new Error(t.loadError);
     const data = await dataResponse.json() as Dataset;
     const coverageData = await coverageResponse.json() as Coverage;
@@ -127,8 +127,8 @@ export default function Home() {
   return (
     <main className="app-shell">
       <header className="topbar">
-        <button className="brand brand-button" type="button" onClick={() => setState('idle')} aria-label="AED Door Arrow home">
-          <span className="protect-mark" aria-hidden="true"><span className="heart-core" /></span><span>Door Arrow</span>
+        <button className="brand brand-button" type="button" onClick={() => setState('idle')} aria-label="AEDoko home">
+          <span className="protect-mark" aria-hidden="true"><span className="heart-core" /></span><span>AEDoko</span>
         </button>
         <button className="language-button" type="button" aria-expanded={languageOpen} onClick={() => setLanguageOpen(!languageOpen)}>
           <span aria-hidden="true">文</span> {localeNames[locale]} <span aria-hidden="true">⌄</span>
