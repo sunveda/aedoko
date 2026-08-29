@@ -5,7 +5,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   root: fileURLToPath(new URL('./github-pages', import.meta.url)),
-  base: '/aedoko/',
+  base: process.env.AEDOKO_BASE_PATH || '/aedoko/',
   publicDir: fileURLToPath(new URL('./public', import.meta.url)),
   css: { postcss: { plugins: [tailwindcss()] } },
   resolve: {

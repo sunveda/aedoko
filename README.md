@@ -8,6 +8,7 @@ AEDoko combines **AED** with the Japanese word **どこ (doko, “where?”)**. 
 
 ## Try it
 
+- **Canonical public URL:** <https://sunveda.tech/app/aedoko>
 - **GitHub Pages:** <https://sunveda.github.io/aedoko/>
 - **Private pilot:** <https://aed-door-arrow-tokyo-pilot.sarveshwar1986.chatgpt.site/>
 
