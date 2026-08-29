@@ -126,6 +126,10 @@ export default function Home() {
 
   return (
     <main className="app-shell">
+      <a className="site-return" href="https://sunveda.tech/" aria-label="Return to the SunVeda Technologies main website">
+        <span aria-hidden="true">←</span>
+        <span>SunVeda Technologies</span>
+      </a>
       <header className="topbar">
         <button className="brand brand-button" type="button" onClick={() => setState('idle')} aria-label="AEDoko home">
           <span className="protect-mark" aria-hidden="true"><span className="heart-core" /></span><span>AEDoko</span>
