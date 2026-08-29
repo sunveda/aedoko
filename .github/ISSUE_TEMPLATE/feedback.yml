@@ -1,0 +1,55 @@
+name: Give AEDoko feedback
+description: Report a problem, suggest an improvement, or flag incorrect AED information.
+title: "[Feedback]: "
+labels:
+  - feedback
+assignees:
+  - sunveda
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for improving AEDoko. This form creates a public GitHub issue. Do not use it during an emergency and do not include private or medical information.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Feedback type
+      options:
+        - Incorrect or outdated AED information
+        - App problem or bug
+        - Feature idea
+        - Accessibility
+        - Translation
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: page
+    attributes:
+      label: Page or AED listing
+      description: Paste the relevant page, route, or official listing URL if applicable.
+
+  - type: textarea
+    id: details
+    attributes:
+      label: What should we know?
+      description: Explain what happened, what is incorrect, or what you would like AEDoko to improve.
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Supporting source or screenshot
+      description: Share a public official source when reporting AED data. You can also attach a screenshot.
+
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy confirmation
+      options:
+        - label: I have not included private personal information or details about an active emergency.
+          required: true
+

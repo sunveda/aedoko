@@ -12,6 +12,8 @@ type DeviceOrientationWithCompass = DeviceOrientationEvent & { webkitCompassHead
 
 const DEMO_POSITION = { latitude: 35.6655, longitude: 139.7708 };
 const FOUNDATION_MAP = 'https://www.qqzaidanmap.jp/';
+const CITY_SUBMISSION_FORM = 'https://github.com/sunveda/aedoko/issues/new?template=city-submission.yml';
+const FEEDBACK_FORM = 'https://github.com/sunveda/aedoko/issues/new?template=feedback.yml';
 
 function formatDistance(meters: number, locale: Locale) {
   const formatter = new Intl.NumberFormat(locale === 'ja-x-easy' ? 'ja' : locale, { maximumFractionDigits: meters < 1000 ? 0 : 1 });
@@ -201,6 +203,13 @@ export default function Home() {
       )}
 
       <section className="trust-row" aria-label="Pilot details"><div><span className="status-dot" /> <strong>{t.pilot}</strong></div><p>{t.varies}</p><p><strong>{sourcedCount} / 62</strong> {t.sourced}</p><p><strong>{validCount}</strong> {t.validated}</p></section>
+      <section className="community-panel" aria-labelledby="community-title">
+        <div className="community-copy"><p className="step-label">03 / COMMUNITY</p><h2 id="community-title">{t.communityTitle}</h2><p>{t.communityBody}</p></div>
+        <div className="community-actions">
+          <a className="community-action community-action-primary" href={CITY_SUBMISSION_FORM} target="_blank" rel="noreferrer"><span><strong>{t.addCity}</strong><small>{t.addCityHint}</small></span><span aria-hidden="true">↗</span></a>
+          <a className="community-action" href={FEEDBACK_FORM} target="_blank" rel="noreferrer"><span><strong>{t.giveFeedback}</strong><small>{t.feedbackHint}</small></span><span aria-hidden="true">↗</span></a>
+        </div>
+      </section>
       <footer><p>{t.arrowWarning}</p><button type="button" onClick={() => setCoverageOpen(true)}>{t.coverage}</button></footer>
 
       {languageOpen && <div className="language-popover" role="dialog" aria-label={t.language}><div className="popover-head"><strong>{t.language}</strong><button type="button" onClick={() => setLanguageOpen(false)} aria-label={t.close}>×</button></div><div className="language-grid">{(Object.keys(localeNames) as Locale[]).map((key) => <button className={key === locale ? 'selected' : ''} type="button" key={key} lang={key === 'ja-x-easy' ? 'ja' : key} onClick={() => chooseLocale(key)}>{localeNames[key]}</button>)}</div><p>{t.reviewPending}</p></div>}

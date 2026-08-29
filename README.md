@@ -50,6 +50,15 @@ npm run build
 npm run build:pages
 ```
 
+## Community contributions
+
+- **Add a city:** contributors use a structured GitHub form to share official AED datasets, municipal maps, or individual official location links.
+- **Review:** each city submission automatically creates an unverified draft source-proposal pull request assigned to `sunveda`.
+- **Publish safely:** merging that proposal records the source lead only. Dataset-specific import and validation remain a separate maintainer step, so unverified coordinates never enter the live snapshot automatically.
+- **Feedback:** a second structured form creates a labeled GitHub issue for data problems, bugs, accessibility concerns, translation feedback, and ideas.
+
+See [`community/README.md`](community/README.md) for the complete review flow.
+
 ## Safety and limitations
 
 - Call 119 first and begin CPR when appropriate.

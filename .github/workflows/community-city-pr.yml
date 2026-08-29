@@ -1,0 +1,104 @@
+name: Create city source proposal
+
+on:
+  issues:
+    types:
+      - opened
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  create-proposal:
+    if: contains(github.event.issue.labels.*.name, 'city-submission')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create an unverified draft proposal PR
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const { owner, repo } = context.repo;
+            const branch = `community/city-submission-${issue.number}`;
+            const path = `community/submissions/issue-${issue.number}.md`;
+
+            const { data: repository } = await github.rest.repos.get({ owner, repo });
+            const base = repository.default_branch;
+            const { data: baseRef } = await github.rest.git.getRef({
+              owner,
+              repo,
+              ref: `heads/${base}`,
+            });
+
+            await github.rest.git.createRef({
+              owner,
+              repo,
+              ref: `refs/heads/${branch}`,
+              sha: baseRef.object.sha,
+            });
+
+            const proposal = [
+              `# City AED source proposal from issue #${issue.number}`,
+              '',
+              '> **Review status:** Unverified community submission. Merging this proposal records a source lead only; it does not publish AED locations.',
+              '',
+              `- Submitted by: @${issue.user.login}`,
+              `- Submitted at: ${issue.created_at}`,
+              `- Original issue: ${issue.html_url}`,
+              '',
+              '## Submitted information',
+              '',
+              issue.body || '_No submission body was provided._',
+              '',
+              '## Maintainer review',
+              '',
+              '- [ ] Source publisher and authority verified',
+              '- [ ] License or reuse terms verified',
+              '- [ ] Coverage area and update date verified',
+              '- [ ] Coordinate and address quality assessed',
+              '- [ ] Importer or normalization work tracked separately',
+              '',
+            ].join('\n');
+
+            await github.rest.repos.createOrUpdateFileContents({
+              owner,
+              repo,
+              path,
+              branch,
+              message: `Add city source proposal from issue #${issue.number}`,
+              content: Buffer.from(proposal, 'utf8').toString('base64'),
+            });
+
+            const cleanTitle = issue.title.replace(/^\[City\]:\s*/i, '').trim();
+            const { data: pull } = await github.rest.pulls.create({
+              owner,
+              repo,
+              base,
+              head: branch,
+              draft: true,
+              title: `City source proposal: ${cleanTitle || `issue #${issue.number}`}`,
+              body: `Draft proposal generated from #${issue.number}.\n\nReview the source authority, reuse terms, coverage, and data quality before merging. This PR does not add records to the live AED dataset.`,
+            });
+
+            await github.rest.issues.addLabels({
+              owner,
+              repo,
+              issue_number: pull.number,
+              labels: ['city-submission'],
+            });
+
+            await github.rest.issues.addAssignees({
+              owner,
+              repo,
+              issue_number: pull.number,
+              assignees: ['sunveda'],
+            });
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: issue.number,
+              body: `Thank you. Draft source proposal #${pull.number} is ready for maintainer review. No AED location has been published automatically.`,
+            });

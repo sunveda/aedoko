@@ -1,0 +1,90 @@
+name: Add AED data for a city
+description: Share official AED datasets or location links so AEDoko can evaluate a new city.
+title: "[City]: "
+labels:
+  - city-submission
+assignees:
+  - sunveda
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping AEDoko grow. Please share public, official, or otherwise trustworthy AED sources. Your submission will create an unverified draft proposal for maintainer review. It will not publish AED locations automatically.
+
+  - type: input
+    id: country
+    attributes:
+      label: Country or region
+      placeholder: Japan
+    validations:
+      required: true
+
+  - type: input
+    id: city
+    attributes:
+      label: City, municipality, or coverage area
+      placeholder: Yokohama
+    validations:
+      required: true
+
+  - type: textarea
+    id: source_links
+    attributes:
+      label: Official AED dataset or location links
+      description: Add one URL per line. Government open-data pages, municipal maps, recognized AED registries, CSV, JSON, GeoJSON, or API documentation are especially useful.
+      placeholder: |
+        https://example-city.gov/open-data/aed
+        https://example-city.gov/maps/aed-locations
+    validations:
+      required: true
+
+  - type: dropdown
+    id: source_format
+    attributes:
+      label: Source format
+      options:
+        - CSV or spreadsheet
+        - JSON, GeoJSON, or API
+        - Interactive map or web page
+        - PDF or document
+        - Multiple formats
+        - Unknown
+    validations:
+      required: true
+
+  - type: input
+    id: license
+    attributes:
+      label: License or reuse terms
+      description: Link or name the license if known. Leave blank if you could not find it.
+      placeholder: Creative Commons Attribution 4.0
+
+  - type: textarea
+    id: coverage_notes
+    attributes:
+      label: Coverage and access notes
+      description: Tell us what area the source covers, when it was last updated, and whether it includes opening hours or placement details.
+      placeholder: Covers the whole city and was updated in June 2026.
+
+  - type: textarea
+    id: sample_locations
+    attributes:
+      label: Example AED location links
+      description: If there is no downloadable dataset, share a few representative official listing or map links.
+
+  - type: input
+    id: contact
+    attributes:
+      label: Contact information (optional)
+      description: Add a public organization contact or your preferred public contact method. Do not include private or medical information.
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Submission confirmation
+      options:
+        - label: I understand this is an unverified source proposal and no AED location will be published until it is reviewed.
+          required: true
+        - label: I have not included private personal information or details about an active emergency.
+          required: true
+
