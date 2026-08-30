@@ -162,14 +162,16 @@ export default function Home() {
         <a className="call-button" href="tel:119"><span aria-hidden="true">☎</span><span><small>{t.call}</small>119</span></a>
       </section>
 
+      <nav className="map-access-bar" aria-label={t.viewMap}>
+        <button className="map-action" ref={mapButtonRef} type="button" onClick={() => setMapOpen(true)}><span aria-hidden="true">⌖</span><span>{t.viewMap}<small>{t.viewMapHint}</small></span><span aria-hidden="true">→</span></button>
+      </nav>
+
       {state === 'idle' && (
         <section className="finder" id="top">
           <div className="finder-copy"><p className="step-label">01 / {t.findLabel}</p><h2>{t.findTitle}</h2><p className="lede">{t.findBody}</p></div>
           <div className="arrow-stage" aria-hidden="true"><div className="orbit orbit-one" /><div className="orbit orbit-two" /><div className="north">N</div><div className="find-pointer hero-pointer" /><div className="pulse-dot" /></div>
           <div className="actions">
             <button className="primary-action" type="button" onClick={useLocation}><span className="location-icon" aria-hidden="true">◎</span><span>{t.useLocation}<small>{t.privacy}</small></span><span aria-hidden="true">→</span></button>
-            <button className="demo-action" type="button" onClick={useDemo}>{t.demo} <span aria-hidden="true">→</span></button>
-            <button className="map-action" ref={mapButtonRef} type="button" onClick={() => setMapOpen(true)}><span aria-hidden="true">⌖</span><span>{t.viewMap}<small>{t.viewMapHint}</small></span><span aria-hidden="true">→</span></button>
           </div>
         </section>
       )}

@@ -24,6 +24,8 @@ button:focus-visible, a:focus-visible { outline: 4px solid #287c68; outline-offs
 .emergency-strip p:last-child { margin: 8px 0 0; font-size: clamp(14px, 2vw, 18px); }
 .call-button { min-width: 154px; min-height: 76px; display: flex; align-items: center; justify-content: center; gap: 13px; color: var(--signal); background: #fff; text-decoration: none; font-size: 32px; font-weight: 900; box-shadow: 5px 5px 0 #7e1e18; }
 .call-button small { display: block; font-size: 9px; letter-spacing: .2em; }
+.map-access-bar { padding: 10px clamp(20px, 5vw, 72px); background: #d8eee6; border-bottom: 1px solid var(--ink); }
+.map-access-bar .map-action { width: 100%; min-height: 58px; }
 .finder { display: grid; grid-template-columns: minmax(260px, .8fr) minmax(320px, 1.2fr) minmax(260px, .8fr); align-items: center; gap: 34px; min-height: 470px; padding: 40px clamp(20px, 5vw, 72px); background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 52px 52px; }
 .step-label { color: #287c68; }
 .finder h2 { max-width: 450px; margin: 0; font-size: clamp(44px, 7vw, 92px); line-height: .88; letter-spacing: -.07em; }
