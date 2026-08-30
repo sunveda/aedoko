@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { FeatureCollection, Point } from 'geojson';
 import type { GeoJSONSource, Map as MapLibreMap, Marker } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import type { AedRecord } from '@/lib/aed';
 
 type Dataset = { recordCount: number; records: AedRecord[] };
@@ -102,6 +103,7 @@ export default function AedMapPanel({ labels, onClose }: Props) {
     let cancelled = false;
     let map: MapLibreMap | null = null;
     let mapReady = false;
+    let setupTimeout: number | null = null;
 
     const loadMap = async () => {
       try {
@@ -112,6 +114,7 @@ export default function AedMapPanel({ labels, onClose }: Props) {
         if (!response.ok) throw new Error('AED data unavailable');
         const dataset = await response.json() as Dataset;
         if (cancelled || !containerRef.current) return;
+        maplibregl.setWorkerUrl(maplibreWorkerUrl);
 
         const data: FeatureCollection<Point, MapProperties> = {
           type: 'FeatureCollection',
@@ -140,77 +143,88 @@ export default function AedMapPanel({ labels, onClose }: Props) {
         mapRef.current = map;
         map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right');
 
-        map.on('load', () => {
+        const setupAedLayers = () => {
           if (!map || cancelled) return;
-          map.addSource('aeds', {
-            type: 'geojson',
-            data,
-            cluster: true,
-            clusterMaxZoom: 15,
-            clusterRadius: 48,
-          });
-          map.addLayer({
-            id: 'aed-clusters',
-            type: 'circle',
-            source: 'aeds',
-            filter: ['has', 'point_count'],
-            paint: {
-              'circle-color': ['step', ['get', 'point_count'], '#287c68', 100, '#112b2c', 750, '#e83b2f'],
-              'circle-radius': ['step', ['get', 'point_count'], 18, 100, 24, 750, 31],
-              'circle-stroke-color': '#ffffff',
-              'circle-stroke-width': 2,
-            },
-          });
-          map.addLayer({
-            id: 'aed-cluster-count',
-            type: 'symbol',
-            source: 'aeds',
-            filter: ['has', 'point_count'],
-            layout: { 'text-field': ['get', 'point_count_abbreviated'], 'text-size': 12 },
-            paint: { 'text-color': '#ffffff' },
-          });
-          map.addLayer({
-            id: 'aed-points',
-            type: 'circle',
-            source: 'aeds',
-            filter: ['!', ['has', 'point_count']],
-            paint: {
-              'circle-color': '#e83b2f',
-              'circle-radius': 7,
-              'circle-stroke-color': '#ffffff',
-              'circle-stroke-width': 2,
-            },
-          });
+          try {
+            map.addSource('aeds', {
+              type: 'geojson',
+              data,
+              cluster: true,
+              clusterMaxZoom: 15,
+              clusterRadius: 48,
+            });
+            map.addLayer({
+              id: 'aed-clusters',
+              type: 'circle',
+              source: 'aeds',
+              filter: ['has', 'point_count'],
+              paint: {
+                'circle-color': ['step', ['get', 'point_count'], '#287c68', 100, '#112b2c', 750, '#e83b2f'],
+                'circle-radius': ['step', ['get', 'point_count'], 18, 100, 24, 750, 31],
+                'circle-stroke-color': '#ffffff',
+                'circle-stroke-width': 2,
+              },
+            });
+            map.addLayer({
+              id: 'aed-cluster-count',
+              type: 'symbol',
+              source: 'aeds',
+              filter: ['has', 'point_count'],
+              layout: { 'text-field': ['get', 'point_count_abbreviated'], 'text-size': 12 },
+              paint: { 'text-color': '#ffffff' },
+            });
+            map.addLayer({
+              id: 'aed-points',
+              type: 'circle',
+              source: 'aeds',
+              filter: ['!', ['has', 'point_count']],
+              paint: {
+                'circle-color': '#e83b2f',
+                'circle-radius': 7,
+                'circle-stroke-color': '#ffffff',
+                'circle-stroke-width': 2,
+              },
+            });
 
-          map.on('click', 'aed-clusters', async (event) => {
-            if (!map) return;
-            const feature = map.queryRenderedFeatures(event.point, { layers: ['aed-clusters'] })[0];
-            const clusterId = Number(feature?.properties?.cluster_id);
-            if (!feature || !Number.isFinite(clusterId) || feature.geometry.type !== 'Point') return;
-            const source = map.getSource('aeds') as GeoJSONSource;
-            const zoom = await source.getClusterExpansionZoom(clusterId);
-            map.easeTo({ center: feature.geometry.coordinates as [number, number], zoom });
-          });
+            map.on('click', 'aed-clusters', async (event) => {
+              if (!map) return;
+              const feature = map.queryRenderedFeatures(event.point, { layers: ['aed-clusters'] })[0];
+              const clusterId = Number(feature?.properties?.cluster_id);
+              if (!feature || !Number.isFinite(clusterId) || feature.geometry.type !== 'Point') return;
+              const source = map.getSource('aeds') as GeoJSONSource;
+              const zoom = await source.getClusterExpansionZoom(clusterId);
+              map.easeTo({ center: feature.geometry.coordinates as [number, number], zoom });
+            });
 
-          map.on('click', 'aed-points', (event) => {
-            if (!map || !event.features?.[0] || event.features[0].geometry.type !== 'Point') return;
-            const feature = event.features[0];
-            const properties = feature.properties as MapProperties;
-            new maplibregl.Popup({ closeButton: true, maxWidth: '320px', offset: 12 })
-              .setLngLat(feature.geometry.coordinates as [number, number])
-              .setDOMContent(createPopupContent(properties, labels))
-              .addTo(map);
-          });
+            map.on('click', 'aed-points', (event) => {
+              if (!map || !event.features?.[0] || event.features[0].geometry.type !== 'Point') return;
+              const feature = event.features[0];
+              const properties = feature.properties as MapProperties;
+              new maplibregl.Popup({ closeButton: true, maxWidth: '320px', offset: 12 })
+                .setLngLat(feature.geometry.coordinates as [number, number])
+                .setDOMContent(createPopupContent(properties, labels))
+                .addTo(map);
+            });
 
-          for (const layer of ['aed-clusters', 'aed-points']) {
-            map.on('mouseenter', layer, () => { if (map) map.getCanvas().style.cursor = 'pointer'; });
-            map.on('mouseleave', layer, () => { if (map) map.getCanvas().style.cursor = ''; });
+            for (const layer of ['aed-clusters', 'aed-points']) {
+              map.on('mouseenter', layer, () => { if (map) map.getCanvas().style.cursor = 'pointer'; });
+              map.on('mouseleave', layer, () => { if (map) map.getCanvas().style.cursor = ''; });
+            }
+
+            if (setupTimeout != null) window.clearTimeout(setupTimeout);
+            setRecordCount(dataset.recordCount || dataset.records.length);
+            mapReady = true;
+            setStatus('ready');
+          } catch {
+            if (setupTimeout != null) window.clearTimeout(setupTimeout);
+            setStatus('error');
           }
+        };
 
-          setRecordCount(dataset.recordCount || dataset.records.length);
-          mapReady = true;
-          setStatus('ready');
-        });
+        map.once('style.load', setupAedLayers);
+        setupTimeout = window.setTimeout(() => {
+          if (!cancelled && !mapReady) setStatus('error');
+        }, 15_000);
         map.on('error', (event) => {
           if (!cancelled && !mapReady && !event.error?.message?.includes('sprite')) setStatus('error');
         });
@@ -222,6 +236,7 @@ export default function AedMapPanel({ labels, onClose }: Props) {
     void loadMap();
     return () => {
       cancelled = true;
+      if (setupTimeout != null) window.clearTimeout(setupTimeout);
       markerRef.current?.remove();
       markerRef.current = null;
       map?.remove();
