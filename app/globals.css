@@ -49,7 +49,7 @@ button:focus-visible, a:focus-visible { outline: 4px solid #287c68; outline-offs
 .map-action { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; padding: 12px 18px; background: var(--mint); color: var(--ink); font-weight: 800; }
 .map-action > span:first-child { font-size: 25px; }
 .map-action small { display: block; margin-top: 4px; color: #315657; font-size: 11px; font-weight: 400; }
-.trust-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; align-items: center; padding: 18px clamp(20px, 5vw, 72px); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 12px; }
+.trust-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; align-items: center; padding: 18px clamp(20px, 5vw, 72px); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 12px; }
 .trust-row p { margin: 0; }
 .status-dot { display: inline-block; width: 9px; height: 9px; margin-right: 8px; border-radius: 50%; background: #2e9d66; }
 .community-panel { display: grid; grid-template-columns: minmax(240px, .8fr) minmax(360px, 1.2fr); gap: clamp(28px, 6vw, 90px); align-items: end; padding: 34px clamp(20px, 5vw, 72px); background: var(--mint); border-bottom: 1px solid var(--ink); }

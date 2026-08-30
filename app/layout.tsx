@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'AEDoko — Tokyo AED pilot',
+  title: 'AEDoko — Find nearby AEDs in Tokyo',
   description: 'AEDoko helps you find a nearby source-listed AED and call 119 without losing precious time.',
   icons: {
     icon: '/favicon-v2.svg',
