@@ -14,6 +14,8 @@ const DEMO_POSITION = { latitude: 35.6655, longitude: 139.7708 };
 const FOUNDATION_MAP = 'https://www.qqzaidanmap.jp/';
 const CITY_SUBMISSION_FORM = 'https://github.com/sunveda/aedoko/issues/new?template=city-submission.yml';
 const FEEDBACK_FORM = 'https://github.com/sunveda/aedoko/issues/new?template=feedback.yml';
+const SOURCE_REPOSITORY = 'https://github.com/sunveda/aedoko';
+const SAFETY_ACKNOWLEDGMENT_KEY = 'aedoko-public-data-notice-v1';
 const AedMapPanel = lazy(() => import('./map-panel'));
 
 function ProtectedHeartMark() {
@@ -50,6 +52,7 @@ export default function Home() {
   const [heading, setHeading] = useState<number | null>(null);
   const [compassEnabled, setCompassEnabled] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
+  const [safetyNoticeOpen, setSafetyNoticeOpen] = useState(true);
   const mapButtonRef = useRef<HTMLButtonElement>(null);
   const t = useMemo(() => messages(locale), [locale]);
 
@@ -63,6 +66,14 @@ export default function Home() {
   }, []);
 
   useEffect(() => { document.documentElement.lang = locale === 'ja-x-easy' ? 'ja' : locale; }, [locale]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      try { setSafetyNoticeOpen(window.localStorage.getItem(SAFETY_ACKNOWLEDGMENT_KEY) !== 'acknowledged'); }
+      catch { setSafetyNoticeOpen(true); }
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const updateHeading = (event: Event) => {
@@ -140,6 +151,10 @@ export default function Home() {
   const closeMap = () => {
     setMapOpen(false);
     window.requestAnimationFrame(() => mapButtonRef.current?.focus());
+  };
+  const acknowledgeSafetyNotice = () => {
+    try { window.localStorage.setItem(SAFETY_ACKNOWLEDGMENT_KEY, 'acknowledged'); } catch { /* Continue without persistence. */ }
+    setSafetyNoticeOpen(false);
   };
 
   return (
@@ -229,13 +244,15 @@ export default function Home() {
           <a className="community-action" href={FEEDBACK_FORM} target="_blank" rel="noreferrer"><span><strong>{t.giveFeedback}</strong><small>{t.feedbackHint}</small></span><span aria-hidden="true">↗</span></a>
         </div>
       </section>
-      <footer><p>{t.arrowWarning}</p><button type="button" onClick={() => setCoverageOpen(true)}>{t.coverage}</button></footer>
+      <footer><p>{t.arrowWarning}</p><div className="footer-actions"><button type="button" onClick={() => setSafetyNoticeOpen(true)}>{t.safetyLink}</button><button type="button" onClick={() => setCoverageOpen(true)}>{t.coverage}</button></div></footer>
 
       {mapOpen && <Suspense fallback={<section className="map-panel" role="dialog" aria-modal="true" aria-label={t.mapTitle}><div className="map-panel__state" role="status"><span className="loader" aria-hidden="true" /><strong>{t.mapLoading}</strong></div></section>}><AedMapPanel onClose={closeMap} labels={{ title: t.mapTitle, subtitle: t.mapSubtitle, loading: t.mapLoading, close: t.close, center: t.mapCenter, showAll: t.mapShowAll, privacy: t.mapPrivacy, locateError: t.mapLocateError, loadError: t.mapLoadError, retry: t.mapRetry, listed: t.records, placement: t.placement, open24: t.open24, accessUnknown: t.accessUnknown, route: t.route }} /></Suspense>}
 
       {languageOpen && <div className="language-popover" role="dialog" aria-label={t.language}><div className="popover-head"><strong>{t.language}</strong><button type="button" onClick={() => setLanguageOpen(false)} aria-label={t.close}>×</button></div><div className="language-grid">{(Object.keys(localeNames) as Locale[]).map((key) => <button className={key === locale ? 'selected' : ''} type="button" key={key} lang={key === 'ja-x-easy' ? 'ja' : key} onClick={() => chooseLocale(key)}>{localeNames[key]}</button>)}</div><p>{t.reviewPending}</p></div>}
 
       {coverageOpen && <div className="modal-backdrop" role="presentation" onMouseDown={() => setCoverageOpen(false)}><section className="coverage-panel" id="coverage" role="dialog" aria-modal="true" aria-label={t.coverage} onMouseDown={(event) => event.stopPropagation()}><div className="coverage-head"><div><h2>{t.coverage}</h2><p>{coverage?.validatedMunicipalityCount ?? 26} / 62 {t.validated} · {dataset?.recordCount ?? 4880} {t.records}</p></div><button type="button" onClick={() => setCoverageOpen(false)} aria-label={t.close}>×</button></div><div className="coverage-list">{coverage?.municipalities.map((row) => <div className="coverage-row" key={row.municipalityCode}><span className={`coverage-state ${row.status}`} aria-hidden="true"/><strong lang="ja">{row.nameJa}</strong><span>{row.recordCount ? `${row.recordCount} ${t.records}` : t.noLocalData}</span></div>) ?? <p>{t.loadingData}</p>}</div><div className="coverage-foot"><p>{t.varies}</p><a href={FOUNDATION_MAP} target="_blank" rel="noreferrer">{t.nationwideMap} ↗</a></div></section></div>}
+
+      {safetyNoticeOpen && <div className="safety-backdrop"><section className="safety-notice" role="dialog" aria-modal="true" aria-labelledby="safety-title"><div className="safety-notice__mark"><ProtectedHeartMark /></div><p className="step-label">{t.safetyKicker}</p><h2 id="safety-title">{t.safetyTitle}</h2><p className="safety-notice__intro">{t.safetyBody}</p><ul><li>{t.safetyAccuracy}</li><li>{t.safetyVerification}</li><li><strong>{t.safetyEmergency}</strong></li></ul><div className="safety-notice__actions"><a href="tel:119"><span>{t.call}</span><strong>119</strong></a><button type="button" onClick={acknowledgeSafetyNotice}>{t.safetyAcknowledge} <span aria-hidden="true">→</span></button></div><div className="safety-notice__foot"><p>{t.safetyStoredLocally}</p><a href={SOURCE_REPOSITORY} target="_blank" rel="noreferrer">{t.safetySource} ↗</a></div></section></div>}
     </main>
   );
 }
