@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { cardinalDirection, rankAeds, type AedRecord, type RankedAed } from '@/lib/aed';
 import { localeNames, messages, normalizeLocale, type Locale } from './i18n';
 
@@ -14,6 +14,7 @@ const DEMO_POSITION = { latitude: 35.6655, longitude: 139.7708 };
 const FOUNDATION_MAP = 'https://www.qqzaidanmap.jp/';
 const CITY_SUBMISSION_FORM = 'https://github.com/sunveda/aedoko/issues/new?template=city-submission.yml';
 const FEEDBACK_FORM = 'https://github.com/sunveda/aedoko/issues/new?template=feedback.yml';
+const AedMapPanel = lazy(() => import('./map-panel'));
 
 function formatDistance(meters: number, locale: Locale) {
   const formatter = new Intl.NumberFormat(locale === 'ja-x-easy' ? 'ja' : locale, { maximumFractionDigits: meters < 1000 ? 0 : 1 });
@@ -39,6 +40,8 @@ export default function Home() {
   const [isDemo, setIsDemo] = useState(false);
   const [heading, setHeading] = useState<number | null>(null);
   const [compassEnabled, setCompassEnabled] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
+  const mapButtonRef = useRef<HTMLButtonElement>(null);
   const t = useMemo(() => messages(locale), [locale]);
 
   useEffect(() => {
@@ -125,6 +128,10 @@ export default function Home() {
   const likelyCoverageGap = primary ? primary.distanceMeters > 20_000 : false;
   const sourcedCount = coverage?.sourcedMunicipalityCount ?? 33;
   const validCount = coverage?.validatedMunicipalityCount ?? 26;
+  const closeMap = () => {
+    setMapOpen(false);
+    window.requestAnimationFrame(() => mapButtonRef.current?.focus());
+  };
 
   return (
     <main className="app-shell">
@@ -153,6 +160,7 @@ export default function Home() {
           <div className="actions">
             <button className="primary-action" type="button" onClick={useLocation}><span className="location-icon" aria-hidden="true">◎</span><span>{t.useLocation}<small>{t.privacy}</small></span><span aria-hidden="true">→</span></button>
             <button className="demo-action" type="button" onClick={useDemo}>{t.demo} <span aria-hidden="true">→</span></button>
+            <button className="map-action" ref={mapButtonRef} type="button" onClick={() => setMapOpen(true)}><span aria-hidden="true">⌖</span><span>{t.viewMap}<small>{t.viewMapHint}</small></span><span aria-hidden="true">→</span></button>
           </div>
         </section>
       )}
@@ -211,6 +219,8 @@ export default function Home() {
         </div>
       </section>
       <footer><p>{t.arrowWarning}</p><button type="button" onClick={() => setCoverageOpen(true)}>{t.coverage}</button></footer>
+
+      {mapOpen && <Suspense fallback={<section className="map-panel" role="dialog" aria-modal="true" aria-label={t.mapTitle}><div className="map-panel__state" role="status"><span className="loader" aria-hidden="true" /><strong>{t.mapLoading}</strong></div></section>}><AedMapPanel onClose={closeMap} labels={{ title: t.mapTitle, subtitle: t.mapSubtitle, loading: t.mapLoading, close: t.close, center: t.mapCenter, showAll: t.mapShowAll, privacy: t.mapPrivacy, locateError: t.mapLocateError, loadError: t.mapLoadError, retry: t.mapRetry, listed: t.records, placement: t.placement, open24: t.open24, accessUnknown: t.accessUnknown, route: t.route }} /></Suspense>}
 
       {languageOpen && <div className="language-popover" role="dialog" aria-label={t.language}><div className="popover-head"><strong>{t.language}</strong><button type="button" onClick={() => setLanguageOpen(false)} aria-label={t.close}>×</button></div><div className="language-grid">{(Object.keys(localeNames) as Locale[]).map((key) => <button className={key === locale ? 'selected' : ''} type="button" key={key} lang={key === 'ja-x-easy' ? 'ja' : key} onClick={() => chooseLocale(key)}>{localeNames[key]}</button>)}</div><p>{t.reviewPending}</p></div>}
 

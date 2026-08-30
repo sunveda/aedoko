@@ -18,9 +18,12 @@ AEDoko combines **AED** with the Japanese word **どこ (doko, “where?”)**. 
 - Calculates distance, ranking, and direction on the device
 - Shows three candidates with Japanese facility and placement details
 - Offers walking directions and one-tap access to call 119
+- Opens an on-demand, clustered map of all 4,772 listings without loading the map library, tiles, or AED snapshot during the initial page load
 - Supports 16 interface locales, with a clear human-review requirement before public release
 - Preserves source, license, snapshot date, and municipality coverage information
 - Stores only the selected language; location is never stored or sent by AEDoko
+
+The interactive map uses MapLibre with OpenFreeMap tiles. It loads only after the user opens it. The map starts with Tokyo-wide bounds and requests browser location only after the separate **Center on me** action.
 
 ## Tokyo pilot data
 
