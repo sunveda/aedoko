@@ -16,6 +16,15 @@ const CITY_SUBMISSION_FORM = 'https://github.com/sunveda/aedoko/issues/new?templ
 const FEEDBACK_FORM = 'https://github.com/sunveda/aedoko/issues/new?template=feedback.yml';
 const AedMapPanel = lazy(() => import('./map-panel'));
 
+function ProtectedHeartMark() {
+  return (
+    <svg className="protect-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+      <path className="protect-mark__shield" d="M32 3 56 12v17c0 15-9.6 25.8-24 32C17.6 54.8 8 44 8 29V12L32 3Z" />
+      <path className="protect-mark__heart" d="M32 50 18.6 37.6C7.9 27.7 21.5 13.6 32 24.8c10.5-11.2 24.1 2.9 13.4 12.8L32 50Z" />
+    </svg>
+  );
+}
+
 function formatDistance(meters: number, locale: Locale) {
   const formatter = new Intl.NumberFormat(locale === 'ja-x-easy' ? 'ja' : locale, { maximumFractionDigits: meters < 1000 ? 0 : 1 });
   return meters < 1000 ? `${formatter.format(meters)} m` : `${formatter.format(meters / 1000)} km`;
@@ -141,7 +150,7 @@ export default function Home() {
       </a>
       <header className="topbar">
         <button className="brand brand-button" type="button" onClick={() => setState('idle')} aria-label="AEDoko home">
-          <span className="protect-mark" aria-hidden="true"><span className="heart-core" /></span><span>AEDoko</span>
+          <ProtectedHeartMark /><span>AEDoko</span>
         </button>
         <button className="language-button" type="button" aria-expanded={languageOpen} onClick={() => setLanguageOpen(!languageOpen)}>
           <span aria-hidden="true">文</span> {localeNames[locale]} <span aria-hidden="true">⌄</span>
