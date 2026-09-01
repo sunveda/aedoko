@@ -211,10 +211,13 @@ export default function AedMapPanel({ labels, onClose }: Props) {
               map.on('mouseleave', layer, () => { if (map) map.getCanvas().style.cursor = ''; });
             }
 
-            if (setupTimeout != null) window.clearTimeout(setupTimeout);
-            setRecordCount(dataset.recordCount || dataset.records.length);
-            mapReady = true;
-            setStatus('ready');
+            map.once('idle', () => {
+              if (cancelled || mapReady) return;
+              if (setupTimeout != null) window.clearTimeout(setupTimeout);
+              setRecordCount(dataset.recordCount || dataset.records.length);
+              mapReady = true;
+              setStatus('ready');
+            });
           } catch {
             if (setupTimeout != null) window.clearTimeout(setupTimeout);
             setStatus('error');

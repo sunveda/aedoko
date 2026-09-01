@@ -18,6 +18,24 @@ const SOURCE_REPOSITORY = 'https://github.com/sunveda/aedoko';
 const SAFETY_ACKNOWLEDGMENT_KEY = 'aedoko-public-data-notice-v1';
 const AedMapPanel = lazy(() => import('./map-panel'));
 
+function MapLoadingFallback({ labels, onClose }: { labels: ReturnType<typeof messages>; onClose: () => void }) {
+  return (
+    <section className="map-panel" role="dialog" aria-modal="true" aria-labelledby="aed-map-loading-title">
+      <header className="map-panel__header">
+        <div><p className="step-label">TOKYO / {labels.mapLoading}</p><h2 id="aed-map-loading-title">{labels.mapTitle}</h2><p>{labels.mapSubtitle}</p></div>
+        <div className="map-panel__actions">
+          <button type="button" disabled>{labels.mapShowAll}</button>
+          <button type="button" disabled>◎ {labels.mapCenter}</button>
+          <button className="map-panel__close" type="button" onClick={onClose} aria-label={labels.close} autoFocus>×</button>
+        </div>
+      </header>
+      <div className="map-panel__notice"><span>{labels.mapPrivacy}</span></div>
+      <div className="map-panel__canvas" aria-hidden="true" />
+      <div className="map-panel__state" role="status"><span className="loader" aria-hidden="true" /><strong>{labels.mapLoading}</strong></div>
+    </section>
+  );
+}
+
 function ProtectedHeartMark() {
   return (
     <svg className="protect-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
@@ -246,7 +264,7 @@ export default function Home() {
       </section>
       <footer><p>{t.arrowWarning}</p><div className="footer-actions"><button type="button" onClick={() => setSafetyNoticeOpen(true)}>{t.safetyLink}</button><button type="button" onClick={() => setCoverageOpen(true)}>{t.coverage}</button></div></footer>
 
-      {mapOpen && <Suspense fallback={<section className="map-panel" role="dialog" aria-modal="true" aria-label={t.mapTitle}><div className="map-panel__state" role="status"><span className="loader" aria-hidden="true" /><strong>{t.mapLoading}</strong></div></section>}><AedMapPanel onClose={closeMap} labels={{ title: t.mapTitle, subtitle: t.mapSubtitle, loading: t.mapLoading, close: t.close, center: t.mapCenter, showAll: t.mapShowAll, privacy: t.mapPrivacy, locateError: t.mapLocateError, loadError: t.mapLoadError, retry: t.mapRetry, listed: t.records, placement: t.placement, open24: t.open24, accessUnknown: t.accessUnknown, route: t.route }} /></Suspense>}
+      {mapOpen && <Suspense fallback={<MapLoadingFallback labels={t} onClose={closeMap} />}><AedMapPanel onClose={closeMap} labels={{ title: t.mapTitle, subtitle: t.mapSubtitle, loading: t.mapLoading, close: t.close, center: t.mapCenter, showAll: t.mapShowAll, privacy: t.mapPrivacy, locateError: t.mapLocateError, loadError: t.mapLoadError, retry: t.mapRetry, listed: t.records, placement: t.placement, open24: t.open24, accessUnknown: t.accessUnknown, route: t.route }} /></Suspense>}
 
       {languageOpen && <div className="language-popover" role="dialog" aria-label={t.language}><div className="popover-head"><strong>{t.language}</strong><button type="button" onClick={() => setLanguageOpen(false)} aria-label={t.close}>×</button></div><div className="language-grid">{(Object.keys(localeNames) as Locale[]).map((key) => <button className={key === locale ? 'selected' : ''} type="button" key={key} lang={key === 'ja-x-easy' ? 'ja' : key} onClick={() => chooseLocale(key)}>{localeNames[key]}</button>)}</div><p>{t.reviewPending}</p></div>}
 
