@@ -1,6 +1,6 @@
 'use client';
 
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { cardinalDirection, rankAeds, type AedRecord, type RankedAed } from '@/lib/aed';
 import { localeNames, messages, normalizeLocale, type Locale } from './i18n';
 
@@ -166,14 +166,27 @@ export default function Home() {
   const likelyCoverageGap = primary ? primary.distanceMeters > 20_000 : false;
   const sourcedCount = coverage?.sourcedMunicipalityCount ?? 33;
   const validCount = coverage?.validatedMunicipalityCount ?? 26;
-  const closeMap = () => {
+  const closeMap = useCallback(() => {
     setMapOpen(false);
     window.requestAnimationFrame(() => mapButtonRef.current?.focus());
-  };
+  }, []);
+  const mapLabels = useMemo(() => ({
+    title: t.mapTitle, subtitle: t.mapSubtitle, loading: t.mapLoading, close: t.close,
+    center: t.mapCenter, showAll: t.mapShowAll, privacy: t.mapPrivacy, locateError: t.mapLocateError,
+    loadError: t.mapLoadError, retry: t.mapRetry, listed: t.records, placement: t.placement,
+    open24: t.open24, accessUnknown: t.accessUnknown, route: t.route,
+  }), [t]);
   const acknowledgeSafetyNotice = () => {
     try { window.localStorage.setItem(SAFETY_ACKNOWLEDGMENT_KEY, 'acknowledged'); } catch { /* Continue without persistence. */ }
     setSafetyNoticeOpen(false);
   };
+
+  useEffect(() => {
+    if (!mapOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = previousOverflow; };
+  }, [mapOpen]);
 
   return (
     <main className="app-shell">
@@ -264,7 +277,7 @@ export default function Home() {
       </section>
       <footer><p>{t.arrowWarning}</p><div className="footer-actions"><button type="button" onClick={() => setSafetyNoticeOpen(true)}>{t.safetyLink}</button><button type="button" onClick={() => setCoverageOpen(true)}>{t.coverage}</button></div></footer>
 
-      {mapOpen && <Suspense fallback={<MapLoadingFallback labels={t} onClose={closeMap} />}><AedMapPanel onClose={closeMap} labels={{ title: t.mapTitle, subtitle: t.mapSubtitle, loading: t.mapLoading, close: t.close, center: t.mapCenter, showAll: t.mapShowAll, privacy: t.mapPrivacy, locateError: t.mapLocateError, loadError: t.mapLoadError, retry: t.mapRetry, listed: t.records, placement: t.placement, open24: t.open24, accessUnknown: t.accessUnknown, route: t.route }} /></Suspense>}
+      {mapOpen && <Suspense fallback={<MapLoadingFallback labels={t} onClose={closeMap} />}><AedMapPanel onClose={closeMap} labels={mapLabels} /></Suspense>}
 
       {languageOpen && <div className="language-popover" role="dialog" aria-label={t.language}><div className="popover-head"><strong>{t.language}</strong><button type="button" onClick={() => setLanguageOpen(false)} aria-label={t.close}>×</button></div><div className="language-grid">{(Object.keys(localeNames) as Locale[]).map((key) => <button className={key === locale ? 'selected' : ''} type="button" key={key} lang={key === 'ja-x-easy' ? 'ja' : key} onClick={() => chooseLocale(key)}>{localeNames[key]}</button>)}</div><p>{t.reviewPending}</p></div>}
 
