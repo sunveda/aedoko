@@ -6,6 +6,10 @@ Every day, around 40 people need an AED, but finding one quickly can be difficul
 
 AEDoko combines **AED** with the Japanese word **どこ (doko, “where?”)**. It points toward source-listed AED coordinates, shows the three best nearby candidates, and keeps the emergency call action visible throughout the experience.
 
+## Agent handoff
+
+Living status for coding agents: **[docs/CONTEXT.md](docs/CONTEXT.md)**. Operating rules: **[AGENTS.md](AGENTS.md)**.
+
 ## Try it
 
 - **Canonical public URL:** <https://sunveda.tech/app/aedoko>
